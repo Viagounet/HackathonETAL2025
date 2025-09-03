@@ -3,7 +3,9 @@ from PIL import Image
 
 class Segmenteur:
     def __init__(self):
-        self.panoptic_segmentation = pipeline("image-segmentation", "facebook/mask2former-swin-large-cityscapes-panoptic")
+        self.panoptic_segmentation = pipeline("image-segmentation",
+                                              "facebook/mask2former-swin-large-cityscapes-panoptic",
+                                              device="cuda")
         self.segs = None
         self.model = self.panoptic_segmentation.model
         self.labels = self.model.config.id2label
