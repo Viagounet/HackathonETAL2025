@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Local Chatbot</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    #log { border: 1px solid #ddd; padding: 12px; height: 400px; overflow-y: auto; white-space: pre-wrap; }
+    textarea { width: 100%; height: 80px; margin-top: 8px; }
+    input, button { font-size: 14px; margin: 4px 0; }
+    .row { display: flex; gap: 8px; }
+    .row > * { flex: 1; }
+  </style>
+</head>
+<body>
+  <h2>Chat with your LLM</h2>
+
+  <div class="row">
+    <input id="baseUrl" placeholder="Base URL (e.g., http://localhost:8001/v1)" />
+    <input id="model" placeholder="Model (from /models)" />
+  </div>
+  <input id="apiKey" placeholder="API Key (if needed)" />
+
+  <div id="log"></div>
+
+  <textarea id="msg" placeholder="Type your message here..."></textarea>
+  <div class="row">
+    <button id="send">Send</button>
+    <button id="clear">Clear</button>
+    <button id="list">List Models</button>
+  </div>
+
+  <script>
+    const log = (t, prefix="") => {
+      const el = document.getElementById("log");
+      el.textContent += (prefix ? prefix + ": " : "") + t + "\n\n";
+      el.scrollTop = el.scrollHeight;
+    };
+
+    async function listModels() {
+      const base = document.getElementById("baseUrl").value.trim();
+      const key = document.getElementById("apiKey").value.trim();
+      try {
+        const r = await fetch(base + "/models", {
+          headers: key ? { Authorization: "Bearer " + key } : {}
+        });
+        log(await r.text(), "Models");
+      } catch (e) { log(e.toString(), "Error"); }
+    }
+
+    async function sendMsg() {
+      const base = document.getElementById("baseUrl").value.trim();
+      const model = document.getElementById("model").value.trim();
+      const key = document.getElementById("apiKey").value.trim();
+      const user = document.getElementById("msg").value;
+
+      const body = {
+        model,
+        messages: [{ role: "user", content: user }],
+        max_tokens: 200
+      };
+
+      try {
+        const r = await fetch(base + "/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(key ? { Authorization: "Bearer " + key } : {})
+          },
+          body: JSON.stringify(body)
+        });
+        const j = await r.json();
+        log(user, "You");
+        log(j.choices?.[0]?.message?.content || JSON.stringify(j), "Bot");
+      } catch (e) { log(e.toString(), "Error"); }
+    }
+
+    document.getElementById("send").onclick = sendMsg;
+    document.getElementById("clear").onclick = () => document.getElementById("log").textContent = "";
+    document.getElementById("list").onclick = listModels;
+  </script>
+</body>
+</html>
