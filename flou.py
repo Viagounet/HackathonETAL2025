@@ -21,6 +21,12 @@ def enleve_masque(img_unblurred, img_blurred, mask): #img_blurred correspond à 
     blurred_img = cv2.imread(img_blurred)
     out = np.where(mask==np.array([255, 255, 255]), img, blurred_img)
     cv2.imwrite(img_blurred, out) #je remplace directement img_blurred par la nouvelle version
+    
+    
+ # fonction pour convertir pil en cv2
+def pipo(pil_image):
+    opencvImage = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2GRAY)
+    return opencvImage
 
 ##tests##
 flou(path, 61)
