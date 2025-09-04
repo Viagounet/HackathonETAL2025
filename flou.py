@@ -3,16 +3,16 @@ import numpy as np
 from matplotlib import pyplot as plt
 import copy
 
-##exemple de path pour les images et de masque##
-path = "image.png"
-path2 = "image_blurred.png"
+# ##exemple de path pour les images et de masque##
+# path = "image.png"
+# path2 = "image_blurred.png"
 
-mask = np.zeros((841, 861, 3), dtype=np.uint8)
-mask = cv2.circle(mask, center=(400, 400), radius=100, color=(255,255,255), thickness=-1)
+# mask = np.zeros((841, 861, 3), dtype=np.uint8)
+# mask = cv2.circle(mask, center=(400, 400), radius=100, color=(255,255,255), thickness=-1)
 
-mask1 = np.zeros((4, 4, 3), dtype=np.uint8)
-mask2 = cv2.circle(copy.deepcopy(mask1), center=(2, 2), radius=2, color=(255,255,255), thickness=-1)
-####
+# mask1 = np.zeros((4, 4, 3), dtype=np.uint8)
+# mask2 = cv2.circle(copy.deepcopy(mask1), center=(2, 2), radius=2, color=(255,255,255), thickness=-1)
+# ####
 
 def flou(pil, n):
     img = pipo(pil)
@@ -47,9 +47,13 @@ def pourcentage_reussite(mask):
 
 
 def pipo(pil_image):
-    opencvImage = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2GRAY)
+    # Assurez-vous que l'image est au format RGB
+    if not isinstance(pil_image, np.ndarray):
+        opencvImage = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+    else:
+        opencvImage = pil_image
     return opencvImage
 
 ##tests##
 #enleve_masque(path, path2, mask)
-print(pourcentage_reussite(mask2))
+# print(pourcentage_reussite(mask2))
